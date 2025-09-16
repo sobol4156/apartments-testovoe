@@ -90,6 +90,7 @@ const formatPrice = (price: number) => {
     width: 80px;
     min-width: 80px;
     height: 80px;
+    user-select: none;
 
     img {
       width: 100%;

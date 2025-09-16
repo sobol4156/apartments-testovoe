@@ -141,6 +141,7 @@ const handleReset = () => {
         gap: 8px;
         align-items: center;
         font: $text-p2-regular;
+        user-select: none;
 
         @media screen and ($media-tablet) {
             font-size: 13px;
@@ -165,6 +166,7 @@ const handleReset = () => {
         justify-content: center;
         align-items: center;
         transition: $transition-base;
+        user-select: none;
 
         &:hover {
             opacity: 0.6;
