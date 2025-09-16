@@ -21,12 +21,10 @@ const debounce = (func: Function, wait: number) => {
 
 // Debounced функции для обновления фильтров
 const debouncedPriceUpdate = debounce((newRange: number[]) => {
-    console.log("Updating price filter:", newRange);
     apartmentsStore.setPriceRange([newRange[0], newRange[1]]);
 }, 300);
 
 const debouncedSquareUpdate = debounce((newRange: number[]) => {
-    console.log("Updating square filter:", newRange);
     apartmentsStore.setSquareRange([newRange[0], newRange[1]]);
 }, 300);
 
