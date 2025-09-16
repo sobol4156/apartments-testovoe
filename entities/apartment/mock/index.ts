@@ -3,7 +3,7 @@ import { type apartmentsItem } from "../types";
 export const apartmentsItems: apartmentsItem[] = [
   {
     id: 1,
-    image: "item_1.png",
+    image: "images/item_1.png",
     title: "1-комнатная №101",
     price: 5800000,
     floor: 1,
@@ -11,7 +11,7 @@ export const apartmentsItems: apartmentsItem[] = [
   },
   {
     id: 2,
-    image: "item_1.png",
+    image: "images/item_1.png",
     title: "2-комнатная №102",
     price: 7200000,
     floor: 2,
@@ -19,7 +19,7 @@ export const apartmentsItems: apartmentsItem[] = [
   },
   {
     id: 3,
-    image: "item_1.png",
+    image: "images/item_1.png",
     title: "3-комнатная №104",
     price: 6630500,
     floor: 1,
@@ -27,7 +27,7 @@ export const apartmentsItems: apartmentsItem[] = [
   },
   {
     id: 4,
-    image: "item_1.png",
+    image: "images/item_1.png",
     title: "1-комнатная №201",
     price: 6100000,
     floor: 3,
@@ -35,7 +35,7 @@ export const apartmentsItems: apartmentsItem[] = [
   },
   {
     id: 5,
-    image: "item_1.png",
+    image: "images/item_1.png",
     title: "3-комнатная №105",
     price: 6650759,
     floor: 2,
@@ -43,7 +43,7 @@ export const apartmentsItems: apartmentsItem[] = [
   },
   {
     id: 6,
-    image: "item_1.png",
+    image: "images/item_1.png",
     title: "2-комнатная №203",
     price: 8900000,
     floor: 4,
@@ -51,7 +51,7 @@ export const apartmentsItems: apartmentsItem[] = [
   },
   {
     id: 7,
-    image: "item_1.png",
+    image: "images/item_1.png",
     title: "3-комнатная №106",
     price: 6650759,
     floor: 3,
@@ -59,7 +59,7 @@ export const apartmentsItems: apartmentsItem[] = [
   },
   {
     id: 8,
-    image: "item_1.png",
+    image: "images/item_1.png",
     title: "1-комнатная №301",
     price: 5900000,
     floor: 5,
@@ -67,7 +67,7 @@ export const apartmentsItems: apartmentsItem[] = [
   },
   {
     id: 9,
-    image: "item_1.png",
+    image: "images/item_1.png",
     title: "2-комнатная №302",
     price: 8200000,
     floor: 6,
@@ -75,7 +75,7 @@ export const apartmentsItems: apartmentsItem[] = [
   },
   {
     id: 10,
-    image: "item_1.png",
+    image: "images/item_1.png",
     title: "3-комнатная №107",
     price: 6671314,
     floor: 4,
@@ -83,7 +83,7 @@ export const apartmentsItems: apartmentsItem[] = [
   },
   {
     id: 11,
-    image: "item_1.png",
+    image: "images/item_1.png",
     title: "1-комнатная №401",
     price: 6200000,
     floor: 7,
@@ -91,7 +91,7 @@ export const apartmentsItems: apartmentsItem[] = [
   },
   {
     id: 12,
-    image: "item_1.png",
+    image: "images/item_1.png",
     title: "2-комнатная №402",
     price: 9100000,
     floor: 8,
@@ -99,7 +99,7 @@ export const apartmentsItems: apartmentsItem[] = [
   },
   {
     id: 13,
-    image: "item_1.png",
+    image: "images/item_1.png",
     title: "3-комнатная №108",
     price: 6679554,
     floor: 5,
@@ -107,7 +107,7 @@ export const apartmentsItems: apartmentsItem[] = [
   },
   {
     id: 14,
-    image: "item_1.png",
+    image: "images/item_1.png",
     title: "1-комнатная №501",
     price: 6300000,
     floor: 9,
@@ -115,7 +115,7 @@ export const apartmentsItems: apartmentsItem[] = [
   },
   {
     id: 15,
-    image: "item_1.png",
+    image: "images/item_1.png",
     title: "2-комнатная №502",
     price: 9500000,
     floor: 10,
