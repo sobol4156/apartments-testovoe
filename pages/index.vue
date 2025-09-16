@@ -1,25 +1,113 @@
 <script setup lang="ts">
-import Table from '~/shared/ui/table/Table.vue'
+import Button from "~/shared/ui/button/Button.vue";
+import Loading from "~/shared/ui/loading/Loading.vue";
+import IconError from "~/shared/icons/IconError.vue";
+import EmptyState from "~/shared/ui/empty-state/EmptyState.vue";
+import ApartmentFilter from "~/features/apartment-filters/ui/ApartmentFilter.vue";
+import { useApartmentsStore } from "~/entities/apartment/model/store";
+import ApartmentsList from "~/widgets/apartments-list/ui/ApartmentsList.vue";
+import ApartmentsTopFilter from "~/widgets/apartments-top-filter/ui/ApartmentsTopFilter.vue";
 
-const columns = [
-    { key: 'plan', label: 'Планировка' },
-    { key: 'apartment', label: 'Квартира' },
-    { key: 'metre', label: 'S, м²', isSorted: true },
-    { key: 'level', label: 'Этаж', isSorted: true },
-    { key: 'price', label: 'Цена, ₽', isSorted: true },
-]
+const apartmentsStore = useApartmentsStore();
 
-const data = [
-  { plan: '1-комн', apartment: '3-комнатная №104', metre: '63,1', level: 3, price: 4500000 },
-  { plan: '2-комн', apartment: '3-комнатная №105', metre: '63,2', level: 5, price: 7500000 },
-  { plan: '3-комн', apartment: '3-комнатная №106', metre: '63,2', level: 7, price: 9800000 },
-  { plan: 'Студия', apartment: '3-комнатная №106', metre: '63,6', level: 2, price: 3200000 },
-  { plan: '2-комн', apartment: '3-комнатная №108', metre: '63,1', level: 4, price: 7200000 },
-]
+onMounted(() => {
+    apartmentsStore.fetchApartments();
+});
 </script>
 
 <template>
-    <div>
-        <Table :columns="columns" :data="data" />
+    <div class="home">
+        <div class="home__container">
+            <div class="home__content">
+                <h1>Квартиры</h1>
+
+                <ApartmentsTopFilter />
+
+                <ApartmentsList v-if="
+                    !apartmentsStore.isEmpty &&
+                    !apartmentsStore.hasNoData &&
+                    !apartmentsStore.error
+                " :items="apartmentsStore.displayedApartments" />
+
+                <div v-if="apartmentsStore.isLoading" class="home__loading">
+                    <Loading />
+                </div>
+
+                <div v-if="apartmentsStore.error" class="home__error">
+                    <IconError />
+                    <p>Произошла ошибка при загрузке квартир</p>
+                </div>
+
+                <EmptyState v-if="apartmentsStore.isEmpty" title="Ничего не найдено"
+                    description="По заданным фильтрам квартиры не найдены. Попробуйте изменить параметры поиска.">
+                    <template #action>
+                        <Button @click="apartmentsStore.resetFilters()">
+                            Сбросить фильтры
+                        </Button>
+                    </template>
+                </EmptyState>
+
+                <Button v-if="apartmentsStore.hasMoreItems && !apartmentsStore.isLoading" class="home__button"
+                    :loading="apartmentsStore.isLoading" @click="apartmentsStore.loadMore">
+                    Загрузить еще
+                </Button>
+            </div>
+
+            <ApartmentFilter />
+        </div>
     </div>
 </template>
+
+<style lang="scss">
+.home {
+    &__container {
+        display: flex;
+        max-width: $wrapper;
+        padding: 96px 80px;
+        margin: 0 auto;
+        justify-content: space-between;
+        gap: 28px;
+
+        @media screen and ($media-tablet) {
+            padding: 48px 54px;
+        }
+    }
+
+    &__content {
+        max-width: 801px;
+        width: 100%;
+
+        h1 {
+            margin-bottom: 48px;
+
+            @media screen and ($media-tablet) {
+                margin-bottom: 32px;
+            }
+        }
+    }
+
+    &__button {
+        margin-top: 48px;
+    }
+
+    &__loading {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 48px 0;
+    }
+
+    &__error {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 48px 0;
+    }
+}
+
+h1 {
+    font: $text-h1;
+}
+</style>
