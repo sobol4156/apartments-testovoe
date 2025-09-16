@@ -27,8 +27,6 @@ export const useApartmentsStore = defineStore("apartments", () => {
   const error = ref<Error | null>(null);
   const sortBy = ref<SortOption>("default");
   const hasInitialized = ref(false);
-  const priceRange = ref([5500000, 18900000]);
-  const squareRange = ref([33, 123]);
 
   const rooms = reactive([
     {
@@ -63,6 +61,24 @@ export const useApartmentsStore = defineStore("apartments", () => {
     squareRange: [33, 123],
   });
 
+const initPersistedState = () => {
+  const saved = localStorage.getItem("apartments-filters");
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      filters.value = parsed.filters ?? filters.value;
+      sortBy.value = parsed.sortBy ?? "default";
+
+      rooms.forEach((r) => {
+        r.active = filters.value.rooms.includes(r.value);
+      });
+    } catch (e) {
+      console.warn("Ошибка восстановления фильтров:", e);
+    }
+  }
+};
+
+
   const hasMoreItems = computed(() => {
     return displayedApartments.value.length < filteredApartments.value.length;
   });
@@ -83,6 +99,14 @@ export const useApartmentsStore = defineStore("apartments", () => {
   const hasNoData = computed(() => {
     return !isLoading.value && allApartments.value.length === 0;
   });
+
+  // Автосохранение фильтров при изменении
+  const saveFilters = () => {
+    localStorage.setItem(
+      "apartments-filters",
+      JSON.stringify({ filters: filters.value, sortBy: sortBy.value })
+    );
+  };
 
   const sortMapper: Record<
     SortOption,
@@ -160,6 +184,7 @@ export const useApartmentsStore = defineStore("apartments", () => {
       const data = await getApartments();
       allApartments.value = data;
       hasInitialized.value = true;
+      initPersistedState();
       applyFiltersAndSort();
     } catch (err) {
       error.value = err as Error;
@@ -190,11 +215,13 @@ export const useApartmentsStore = defineStore("apartments", () => {
   const setSortBy = (newSortBy: SortOption) => {
     sortBy.value = newSortBy;
     applyFiltersAndSort();
+    saveFilters();
   };
 
   const setRoomsFilter = (rooms: number[]) => {
     filters.value.rooms = rooms;
     applyFiltersAndSort();
+    saveFilters();
   };
 
   const resetRomms = () => {
@@ -204,11 +231,13 @@ export const useApartmentsStore = defineStore("apartments", () => {
   const setPriceRange = (range: [number, number]) => {
     filters.value.priceRange = range;
     applyFiltersAndSort();
+    saveFilters();
   };
 
   const setSquareRange = (range: [number, number]) => {
     filters.value.squareRange = range;
     applyFiltersAndSort();
+    saveFilters();
   };
 
   const resetFilters = () => {
@@ -219,6 +248,7 @@ export const useApartmentsStore = defineStore("apartments", () => {
     };
     sortBy.value = "default";
     applyFiltersAndSort();
+    saveFilters();
   };
 
   const reset = () => {
@@ -236,6 +266,7 @@ export const useApartmentsStore = defineStore("apartments", () => {
       priceRange: [5500000, 18900000],
       squareRange: [33, 123],
     };
+    saveFilters();
   };
 
   return {
@@ -246,7 +277,6 @@ export const useApartmentsStore = defineStore("apartments", () => {
     currentPage,
     itemsPerPage,
     isLoading,
-    squareRange,
     error,
     rooms,
     sortBy,
@@ -256,7 +286,6 @@ export const useApartmentsStore = defineStore("apartments", () => {
     totalPages,
     isEmpty,
     hasNoData,
-    priceRange,
     fetchApartments,
     resetRomms,
     loadMore,
