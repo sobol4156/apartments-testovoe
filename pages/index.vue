@@ -10,6 +10,11 @@ import ApartmentsTopFilter from "~/widgets/apartments-top-filter/ui/ApartmentsTo
 
 const apartmentsStore = useApartmentsStore();
 
+const resetFilters = () => {
+    apartmentsStore.resetFilters();
+    apartmentsStore.resetRomms();
+}
+
 onMounted(() => {
     apartmentsStore.fetchApartments();
 });
@@ -41,7 +46,7 @@ onMounted(() => {
                 <EmptyState v-if="apartmentsStore.isEmpty" title="Ничего не найдено"
                     description="По заданным фильтрам квартиры не найдены. Попробуйте изменить параметры поиска.">
                     <template #action>
-                        <Button @click="apartmentsStore.resetFilters()">
+                        <Button @click="resetFilters">
                             Сбросить фильтры
                         </Button>
                     </template>

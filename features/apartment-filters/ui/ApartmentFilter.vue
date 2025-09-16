@@ -1,302 +1,251 @@
-
 <script setup lang="ts">
-import { reactive, watch, ref } from "vue";
 import IconClose from "~/shared/icons/IconClose.vue";
 import VueSlider from "vue-3-slider-component";
 import { useApartmentsStore } from "~/entities/apartment/model/store";
 
 const apartmentsStore = useApartmentsStore();
-
-const priceRange = ref([5500000, 18900000]);
-const squareRange = ref([33, 123]);
+const { filters, rooms } = storeToRefs(apartmentsStore);
 
 // Debounce функция
 const debounce = (func: Function, wait: number) => {
-  let timeout: number;
-  return function executedFunction(...args: any[]) {
-    const later = () => {
-      clearTimeout(timeout);
-      func(...args);
+    let timeout: number;
+    return function executedFunction(...args: any[]) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
     };
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-  };
 };
 
 // Debounced функции для обновления фильтров
 const debouncedPriceUpdate = debounce((newRange: number[]) => {
-  console.log("Updating price filter:", newRange);
-  apartmentsStore.setPriceRange([newRange[0], newRange[1]]);
+    console.log("Updating price filter:", newRange);
+    apartmentsStore.setPriceRange([newRange[0], newRange[1]]);
 }, 300);
 
 const debouncedSquareUpdate = debounce((newRange: number[]) => {
-  console.log("Updating square filter:", newRange);
-  apartmentsStore.setSquareRange([newRange[0], newRange[1]]);
+    console.log("Updating square filter:", newRange);
+    apartmentsStore.setSquareRange([newRange[0], newRange[1]]);
 }, 300);
 
 // Обработчики изменения слайдеров
-const handlePriceChange = (newRange: number[]) => {
-  priceRange.value = newRange;
-  debouncedPriceUpdate(newRange);
+const handlePriceChange = (newRange: [number, number]) => {
+    filters.value.priceRange = newRange;
+    debouncedPriceUpdate(newRange);
 };
 
-const handleSquareChange = (newRange: number[]) => {
-  squareRange.value = newRange;
-  debouncedSquareUpdate(newRange);
+const handleSquareChange = (newRange: [number, number]) => {
+    filters.value.squareRange = newRange;
+    debouncedSquareUpdate(newRange);
 };
-
-const rooms = reactive([
-  {
-    name: "1к",
-    value: 1,
-    active: false,
-    disabled: false,
-  },
-  {
-    name: "2к",
-    value: 2,
-    active: true,
-    disabled: false,
-  },
-  {
-    name: "3к",
-    value: 3,
-    active: false,
-    disabled: false,
-  },
-  {
-    name: "4к",
-    value: 4,
-    active: false,
-    disabled: true,
-  },
-]);
 
 const handleRoomClick = (room: any) => {
-  if (room.disabled) return;
+    if (room.disabled) return;
 
-  room.active = !room.active;
+    room.active = !room.active;
 
-  rooms.forEach((r) => {
-    if (r.value !== room.value) {
-      r.active = false;
-    }
-  });
+    rooms.value.forEach((r) => {
+        if (r.value !== room.value) {
+            r.active = false;
+        }
+    });
 
-  // Обновляем фильтр в store
-  const activeRooms = rooms.filter((r) => r.active).map((r) => r.value);
-  apartmentsStore.setRoomsFilter(activeRooms);
+    // Обновляем фильтр в store
+    const activeRooms = rooms.value.filter((r) => r.active).map((r) => r.value);
+    apartmentsStore.setRoomsFilter(activeRooms);
 };
 
 const handleReset = () => {
-  // Сбрасываем фильтры локально
-  priceRange.value = [5500000, 18900000];
-  squareRange.value = [33, 123];
-
-  // Сбрасываем комнаты
-  rooms.forEach((room) => (room.active = false));
-
-  // Сбрасываем все фильтры в store
-  apartmentsStore.resetFilters();
+    // Сбрасываем комнаты
+    apartmentsStore.resetRomms();
+    // Сбрасываем все фильтры в store
+    apartmentsStore.resetFilters();
 };
 </script>
 
 <template>
-  <div class="apartments-side-filter">
-    <div class="apartments-side-filter__rooms">
-      <div
-        class="apartments-side-filter__room"
-        :class="{ active: room.active, disabled: room.disabled }"
-        v-for="room in rooms"
-        :key="room.value"
-        @click="handleRoomClick(room)"
-      >
-        <span>{{ room.name }}</span>
-      </div>
+    <div class="apartments-side-filter">
+        <div class="apartments-side-filter__rooms">
+            <div class="apartments-side-filter__room" :class="{ active: room.active, disabled: room.disabled }"
+                v-for="room in rooms" :key="room.value" @click="handleRoomClick(room)">
+                <span>{{ room.name }}</span>
+            </div>
+        </div>
+
+        <div class="apartments-side-filter__price">
+            <p class="title">Стоимость квартиры, ₽</p>
+
+            <div class="description">
+                <p>
+                    от <b>{{ filters.priceRange[0].toLocaleString("ru-RU") }}</b>
+                </p>
+                <p>
+                    до <b>{{ filters.priceRange[1].toLocaleString("ru-RU") }}</b>
+                </p>
+            </div>
+
+            <div class="range">
+                <VueSlider :model-value="filters.priceRange" @update:model-value="handlePriceChange" :min="5500000"
+                    :max="18900000" :step="100000" />
+            </div>
+        </div>
+
+        <div class="apartments-side-filter__square">
+            <p class="title">Площадь квартиры, м²</p>
+
+            <div class="description">
+                <p>
+                    от <b>{{ filters.squareRange[0] }}</b>
+                </p>
+                <p>
+                    до <b>{{ filters.squareRange[1] }}</b>
+                </p>
+            </div>
+
+            <div class="range">
+                <VueSlider :model-value="filters.squareRange" @update:model-value="handleSquareChange" :min="33"
+                    :max="123" :step="1" />
+            </div>
+        </div>
+
+        <div class="apartments-side-filter__reset" @click="handleReset">
+            Сбросить параметры
+
+            <IconClose />
+        </div>
     </div>
-
-    <div class="apartments-side-filter__price">
-      <p class="title">Стоимость квартиры, ₽</p>
-
-      <div class="description">
-        <p>
-          от <b>{{ priceRange[0].toLocaleString("ru-RU") }}</b>
-        </p>
-        <p>
-          до <b>{{ priceRange[1].toLocaleString("ru-RU") }}</b>
-        </p>
-      </div>
-
-      <div class="range">
-        <VueSlider
-          :model-value="priceRange"
-          @update:model-value="handlePriceChange"
-          :min="5500000"
-          :max="18900000"
-          :step="100000"
-        />
-      </div>
-    </div>
-
-    <div class="apartments-side-filter__square">
-      <p class="title">Площадь квартиры, м²</p>
-
-      <div class="description">
-        <p>
-          от <b>{{ squareRange[0] }}</b>
-        </p>
-        <p>
-          до <b>{{ squareRange[1] }}</b>
-        </p>
-      </div>
-
-      <div class="range">
-        <VueSlider
-          :model-value="squareRange"
-          @update:model-value="handleSquareChange"
-          :min="33"
-          :max="123"
-          :step="1"
-        />
-      </div>
-    </div>
-
-    <div class="apartments-side-filter__reset" @click="handleReset">
-      Сбросить параметры
-
-      <IconClose />
-    </div>
-  </div>
 </template>
 
 <style lang="scss">
 .apartments-side-filter {
-  min-width: 399px;
-  height: 372px;
-  background: $color-main-gradient;
-  border-radius: 10px;
-  overflow: hidden;
-  padding: 40px;
-
-  @media screen and ($media-tablet) {
-    min-width: 318px;
-    height: 318px;
-    padding: 20px 19px;
-  }
-
-  &__reset {
-    margin-top: 24px;
-    cursor: pointer;
-    transition: $transition-base;
-    padding: 0 16px;
-    font-size: 13px;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    font: $text-p2-regular;
+    min-width: 399px;
+    height: 372px;
+    background: $color-main-gradient;
+    border-radius: 10px;
+    overflow: hidden;
+    padding: 40px;
 
     @media screen and ($media-tablet) {
-      font-size: 13px;
+        min-width: 318px;
+        height: 318px;
+        padding: 20px 19px;
     }
 
-    &:hover {
-      opacity: 0.6;
-    }
-  }
-
-  &__rooms {
-    display: flex;
-    gap: 16px;
-  }
-
-  &__room {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 1);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: $transition-base;
-
-    &:hover {
-      opacity: 0.6;
-      cursor: pointer;
-    }
-
-    &.active {
-      box-shadow: 0px 6px 20px 0px rgba(149, 208, 161, 1);
-      background-color: $color-main-dark;
-      color: rgba(255, 255, 255, 1);
-    }
-
-    &.disabled {
-      color: $color-main-font-medium;
-      cursor: not-allowed;
-
-      &:hover {
-        opacity: 1;
-      }
-    }
-  }
-
-  &__square,
-  &__price {
-    margin-top: 24px;
-
-    .title {
-      font: $text-p3-regular;
-
-      @media screen and ($media-tablet) {
+    &__reset {
+        margin-top: 24px;
+        cursor: pointer;
+        transition: $transition-base;
+        padding: 0 16px;
         font-size: 13px;
-        line-height: 18px;
-      }
-    }
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        font: $text-p2-regular;
 
-    .description {
-      display: flex;
-      font: $text-p2-regular;
-      margin-top: 8px;
-
-      @media screen and ($media-tablet) {
-        font-size: 12px;
-        margin-top: 4px;
-      }
-
-      p {
-        color: $color-main-font-medium;
-        width: 50%;
-
-        b {
-          color: $color-main-font;
-          font: $text-p2-medium;
-          margin-left: 8px;
-
-          @media screen and ($media-tablet) {
-            font-size: 14px;
-          }
+        @media screen and ($media-tablet) {
+            font-size: 13px;
         }
-      }
+
+        &:hover {
+            opacity: 0.6;
+        }
     }
 
-    .range {
-      margin-top: 4px;
-    }
-  }
-
-  .vue-slider {
-    &-process {
-      background-color: $color-main-dark;
+    &__rooms {
+        display: flex;
+        gap: 16px;
     }
 
-    &-dot-handle {
-      background-color: $color-main-dark;
-      box-shadow: none;
+    &__room {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 1);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: $transition-base;
+
+        &:hover {
+            opacity: 0.6;
+            cursor: pointer;
+        }
+
+        &.active {
+            box-shadow: 0px 6px 20px 0px rgba(149, 208, 161, 1);
+            background-color: $color-main-dark;
+            color: rgba(255, 255, 255, 1);
+        }
+
+        &.disabled {
+            color: $color-main-font-medium;
+            cursor: not-allowed;
+
+            &:hover {
+                opacity: 1;
+            }
+        }
     }
 
-    &-dot-tooltip-inner {
-      display: none;
+    &__square,
+    &__price {
+        margin-top: 24px;
+
+        .title {
+            font: $text-p3-regular;
+
+            @media screen and ($media-tablet) {
+                font-size: 13px;
+                line-height: 18px;
+            }
+        }
+
+        .description {
+            display: flex;
+            font: $text-p2-regular;
+            margin-top: 8px;
+
+            @media screen and ($media-tablet) {
+                font-size: 12px;
+                margin-top: 4px;
+            }
+
+            p {
+                color: $color-main-font-medium;
+                width: 50%;
+
+                b {
+                    color: $color-main-font;
+                    font: $text-p2-medium;
+                    margin-left: 8px;
+
+                    @media screen and ($media-tablet) {
+                        font-size: 14px;
+                    }
+                }
+            }
+        }
+
+        .range {
+            margin-top: 4px;
+        }
     }
-  }
+
+    .vue-slider {
+        &-process {
+            background-color: $color-main-dark;
+        }
+
+        &-dot-handle {
+            background-color: $color-main-dark;
+            box-shadow: none;
+        }
+
+        &-dot-tooltip-inner {
+            display: none;
+        }
+    }
 }
 </style>

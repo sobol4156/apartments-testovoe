@@ -68,6 +68,7 @@ const handleSort = (field: "square" | "floor" | "price") => {
     font: $text-p2-regular;
     padding-bottom: 17px;
     box-shadow: 0px 1px 0px 0px rgba(0, 0, 0, 0.1);
+    user-select: none;
 
     @media screen and ($media-tablet) {
         box-shadow: none;

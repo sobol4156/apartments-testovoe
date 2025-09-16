@@ -27,6 +27,35 @@ export const useApartmentsStore = defineStore("apartments", () => {
   const error = ref<Error | null>(null);
   const sortBy = ref<SortOption>("default");
   const hasInitialized = ref(false);
+  const priceRange = ref([5500000, 18900000]);
+  const squareRange = ref([33, 123]);
+
+  const rooms = reactive([
+    {
+      name: "1к",
+      value: 1,
+      active: false,
+      disabled: false,
+    },
+    {
+      name: "2к",
+      value: 2,
+      active: true,
+      disabled: false,
+    },
+    {
+      name: "3к",
+      value: 3,
+      active: false,
+      disabled: false,
+    },
+    {
+      name: "4к",
+      value: 4,
+      active: false,
+      disabled: true,
+    },
+  ]);
 
   const filters = ref<FilterState>({
     rooms: [],
@@ -168,6 +197,10 @@ export const useApartmentsStore = defineStore("apartments", () => {
     applyFiltersAndSort();
   };
 
+  const resetRomms = () => {
+    rooms.forEach((room) => (room.active = false));
+  };
+
   const setPriceRange = (range: [number, number]) => {
     filters.value.priceRange = range;
     applyFiltersAndSort();
@@ -213,7 +246,9 @@ export const useApartmentsStore = defineStore("apartments", () => {
     currentPage,
     itemsPerPage,
     isLoading,
+    squareRange,
     error,
+    rooms,
     sortBy,
     filters,
     hasInitialized,
@@ -221,7 +256,9 @@ export const useApartmentsStore = defineStore("apartments", () => {
     totalPages,
     isEmpty,
     hasNoData,
+    priceRange,
     fetchApartments,
+    resetRomms,
     loadMore,
     setSortBy,
     setRoomsFilter,
