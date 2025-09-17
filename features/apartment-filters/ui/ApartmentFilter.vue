@@ -2,22 +2,10 @@
 import IconClose from "~/shared/icons/IconClose.vue";
 import VueSlider from "vue-3-slider-component";
 import { useApartmentsStore } from "~/entities/apartment/model/store";
+import { debounce } from "~/shared/lib/debounce";
 
 const apartmentsStore = useApartmentsStore();
 const { filters, rooms } = storeToRefs(apartmentsStore);
-
-// Debounce функция
-const debounce = (func: Function, wait: number) => {
-    let timeout: number;
-    return function executedFunction(...args: any[]) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-};
 
 // Debounced функции для обновления фильтров
 const debouncedPriceUpdate = debounce((newRange: number[]) => {
